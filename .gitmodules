@@ -1,0 +1,3 @@
+[submodule "bootlex"]
+	path = bootlex
+	url = git@github.com:alexex/bootlex.git
