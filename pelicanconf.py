@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = u'sjudeu'
+AUTHOR = u'Miro Beka'
 SITENAME = u'sjudeu.sk'
 SITEURL = ''
 
 PATH = 'content'
+
+STATIC_PATHS = ['files', 'images']
 
 TIMEZONE = 'Europe/Paris'
 
