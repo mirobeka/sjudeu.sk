@@ -16,7 +16,7 @@ production = 'vagrant@localhost:22'
 dest_path = '/www/sjudeu.sk'
 
 # Port for `serve`
-PORT = 8000
+PORT = 8080
 
 def clean():
     """Remove generated files"""
@@ -38,7 +38,7 @@ def regenerate():
     local('pelican -r -s pelicanconf.py')
 
 def serve():
-    """Serve site at http://localhost:8000/"""
+    """Serve site at http://localhost:8080/"""
     os.chdir(env.deploy_path)
 
     class AddressReuseTCPServer(SocketServer.TCPServer):
