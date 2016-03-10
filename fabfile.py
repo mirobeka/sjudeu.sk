@@ -12,16 +12,8 @@ env.deploy_path = 'output'
 DEPLOY_PATH = env.deploy_path
 
 # Remote server configuration
-production = 'root@localhost:22'
-dest_path = '/var/www'
-
-# Rackspace Cloud Files configuration settings
-env.cloudfiles_username = 'my_rackspace_username'
-env.cloudfiles_api_key = 'my_rackspace_api_key'
-env.cloudfiles_container = 'my_cloudfiles_container'
-
-# Github Pages configuration
-env.github_pages_branch = "gh-pages"
+production = 'vagrant@localhost:22'
+dest_path = '/www/sjudeu.sk'
 
 # Port for `serve`
 PORT = 8000
@@ -66,19 +58,27 @@ def preview():
     """Build production version of site"""
     local('pelican -s publishconf.py')
 
-def cf_upload():
-    """Publish to Rackspace Cloud Files"""
-    rebuild()
-    with lcd(DEPLOY_PATH):
-        local('swift -v -A https://auth.api.rackspacecloud.com/v1.0 '
-              '-U {cloudfiles_username} '
-              '-K {cloudfiles_api_key} '
-              'upload -c {cloudfiles_container} .'.format(**env))
+def local_publish(environment):
+    """Publish to local folders via rsync"""
+    if environment == "publish":
+        local('pelican -s publishconf.py')
+    elif environment == "local":
+        local('pelican -s testconf.py')
+    cmd = 'rsync --delete --exclude ".DS_Store" -pthrvz -c {}/ {}'.format(
+            DEPLOY_PATH.rstrip('/') + '/',
+            dest_path
+            )
+    local(cmd)
+
 
 @hosts(production)
-def publish():
+def publish(environment):
     """Publish to production via rsync"""
-    local('pelican -s publishconf.py')
+    if environment == "publish":
+        local('pelican -s publishconf.py')
+    elif environment == "local":
+        local('pelican -s testconf.py')
+
     project.rsync_project(
         remote_dir=dest_path,
         exclude=".DS_Store",
@@ -87,8 +87,3 @@ def publish():
         extra_opts='-c',
     )
 
-def gh_pages():
-    """Publish to GitHub Pages"""
-    rebuild()
-    local("ghp-import -b {github_pages_branch} {deploy_path}".format(**env))
-    local("git push origin {github_pages_branch}".format(**env))
